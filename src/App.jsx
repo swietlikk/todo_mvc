@@ -1,5 +1,5 @@
 import './App.scss';
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Headline} from "./components/Headline.jsx";
 import TodoAdd from "./components/TodoAdd.jsx";
 import TodoList from "./components/TodoList.jsx";
@@ -7,7 +7,11 @@ import TodoList from "./components/TodoList.jsx";
 
 function App() {
     const [todo, setTodo] = useState('');
-    const [todos, setTodos] = useState([]);
+    const [todos, setTodos] = useState(getFromLocalStorage());
+
+    useEffect(() => {
+        updateLocalStorage(todos);
+    }, [todos]);
 
     const getId = (todos) => todos.length === 0 ? 1 : Math.max(...todos.map((task) => task.id)) + 1;
 
@@ -31,8 +35,20 @@ function App() {
     };
 
     const handleDeleteDoneTasks = () => {
-        setTodos(todos.filter((task) => task.status !== 'done'))   ;
+        setTodos(todos.filter((task) => task.status !== 'done'));
     };
+
+    const updateLocalStorage = (data) => {
+        localStorage.setItem('todos', JSON.stringify(data));
+    }
+
+    function getFromLocalStorage(){
+        const data = localStorage.getItem('todos');
+        if (data !== null) {
+            return JSON.parse(data);
+        }
+        return [];
+    }
 
     return (
         <div className="todoapp">
